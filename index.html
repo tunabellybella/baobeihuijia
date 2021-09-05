@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang='en'>
+  <head>
+    <meta charset='utf-8' />
+    <title>宝贝你在哪？</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1' />
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v2.4.0/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v2.4.0/mapbox-gl.css' rel='stylesheet' />
+    <script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.0/mapbox-gl-geocoder.min.js'></script>
+    <link rel='stylesheet' href='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.0/mapbox-gl-geocoder.css' type='text/css' />
+
+    <style>
+      body { margin: 0; padding: 0; }
+      #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+    </style>
+  </head>
+  <body>
+    <div id='map'></div>
+    <script>
+    // The value for 'accessToken' begins with 'pk...'
+    mapboxgl.accessToken = 'pk.eyJ1IjoicGF0Y2hlZXo5NCIsImEiOiJja2R5OXczaDQwd21hMnlud2l6aWV5MDI1In0.lvZ3BGwVfrPAc7QMeWTUSg'; 
+    var map = new mapboxgl.Map({
+      container: 'map',
+      // Replace YOUR_STYLE_URL with your style URL.
+      style: 'mapbox://styles/patcheez94/cksxdf3d714or18rse3eymk2p', 
+      center: [102.531419, 34.309010],
+      zoom: 3.34
+    });
+
+    /* 
+Add an event listener that runs
+  when a user clicks on the map element.
+*/
+map.on('click', function(e) {
+  // If the user clicked on one of your markers, get its information.
+  var features = map.queryRenderedFeatures(e.point, {
+    layers: ['data-driven-circles'] // replace with your layer name
+  });
+  if (!features.length) {
+    return;
+  }
+  var feature = features[0];
+
+   /* 
+    Create a popup, specify its options 
+    and properties, and add it to the map.
+  */
+  var popup = new mapboxgl.Popup({ offset: [0, -15] })
+    .setLngLat(feature.geometry.coordinates)
+    .setHTML(
+      '<h3>' + feature.properties.Name + '</h3>' +
+      '<p>' + '出生日期:' + " " + feature.properties.DOB + '</p>' +
+      '<p>' + '失踪日期:' + " " + feature.properties.Missing_date	+ '</p>' +
+      '<p>' + '失踪地址:' + " " + feature.properties.Missing_location + '</p>' +
+      '<p>' + '特征:' + " " + feature.properties.Unique_traits	+ '</p>' +
+      '<p>' + '宝贝回家编号:' + " " + feature.properties.ID	+ '</p>' 
+
+      )
+    .addTo(map);
+
+});
+
+map.on('load', function() {
+  var geocoder = new MapboxGeocoder({ // Initialize the geocoder
+    accessToken: mapboxgl.accessToken, // Set the access token
+    mapboxgl: mapboxgl, // Set the mapbox-gl instance
+    zoom: 13, // Set the zoom level for geocoding results
+    placeholder: "寻找宝贝地址", // This placeholder text will display in the search bar
+    // bbox: [108.090106, 32.912857, 106.331556, 31.349365] // Set a bounding box in minLon,minLat,maxLon,maxLat order 
+    // bbox: [102.870225, 35.560506, 104.067919, 32.924119]
+    bbox: [80.087246, 30.179226, 121.855298, 53.432533]
+  });
+  // Add the geocoder to the map
+  map.addControl(geocoder, 'top-right'); // Add the search box to the top right
+});  
+
+    </script>
+  </body>
+</html>
